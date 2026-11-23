@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mi dieta">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2f4a2a">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Plan semanal de Elena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday: a calm kitchen companion, glanceable on the phone
+   IDEA the fridge-door menu card: one day at a time, each meal a plate with its weights
+   PICTURE the day's plate: big kcal figure + a thick macro band (protein / carbs / fat) and a 7-day strip
+   COLOUR white ground, deep olive field, tomato for protein, wheat for carbs, olive-oil green for fat
+   TYPE Fraunces for figures and titles + Inter for text
+   LAYOUT phone: title, day chips, plate summary, meal cards; laptop: summary left sticky, meals right */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#121510);--ink:light-dark(#1b2016,#eef0e8);--mute:light-dark(#5d6656,#a8b09d);--field:light-dark(#2f4a2a,#1d2b1a);--onf:#f4f6ee;--card:light-dark(#f6f7f2,#1a1f17);--line:light-dark(#e2e5da,#2c3328);--p:#d9412f;--h:#e0a13a;--g:#7d9a2c}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3,.num{font-family:Fraunces,Georgia,serif;letter-spacing:-.02em;line-height:1.05}
+.top{background:var(--field);color:var(--onf);padding:calc(22px + env(safe-area-inset-top)) max(5vw,16px,env(safe-area-inset-right)) 0 max(5vw,16px,env(safe-area-inset-left))}
+.top h1{font-size:clamp(30px,6vw,46px);margin:0 0 4px;font-weight:800}
+.top p{margin:0 0 16px;color:#cdd6c2;font-size:15px}
+.days{display:flex;gap:6px;overflow-x:auto;padding-bottom:14px}
+.days button{flex:none;min-width:52px;height:56px;border:0;border-radius:14px;background:rgba(255,255,255,.1);color:var(--onf);font:600 14px Inter,sans-serif;cursor:pointer;display:grid;place-items:center;line-height:1.1}
+.days button small{display:block;font-weight:400;font-size:12px;opacity:.8}
+.days button[aria-pressed=true]{background:var(--onf);color:var(--field)}
+.days button:focus-visible,.tabs button:focus-visible{outline:3px solid var(--h);outline-offset:2px}
+nav.tabs{display:flex;gap:4px;overflow-x:auto}
+.tabs button{flex:none;border:0;background:none;color:#cdd6c2;font:600 15px Inter,sans-serif;padding:12px 14px;min-height:44px;border-bottom:3px solid transparent;cursor:pointer}
+.tabs button[aria-selected=true]{color:#fff;border-color:var(--h)}
+main{padding:20px max(5vw,16px) 40px;max-width:1240px;margin:0 auto}
+.grid{display:grid;gap:20px}
+@media(min-width:860px){.grid{grid-template-columns:minmax(0,360px) minmax(0,1fr);align-items:start}.sum{position:sticky;top:16px}}
+.sum{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px}
+.tag{display:inline-block;background:var(--field);color:var(--onf);border-radius:99px;padding:3px 12px;font-size:13px;font-weight:600}
+.big{font-size:clamp(56px,14vw,76px);font-weight:800;margin:10px 0 0}
+.big span{font-size:20px;font-weight:600;color:var(--mute);margin-left:6px}
+.band{display:flex;height:22px;border-radius:99px;overflow:hidden;margin:14px 0 12px}
+.band i{display:block;height:100%}
+.mac{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.mac div{border-radius:12px;padding:10px;background:var(--bg);border:1px solid var(--line)}
+.mac b{display:block;font:800 24px Fraunces,serif}
+.mac small{color:var(--mute);font-size:13px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;align-items:end;height:110px;margin-top:20px}
+.week button{border:0;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;justify-content:end;height:100%;color:var(--mute);font:600 12px Inter,sans-serif;gap:4px}
+.week span{display:block;border-radius:6px 6px 2px 2px;background:color-mix(in srgb,var(--g) 45%,transparent)}
+.week button[aria-pressed=true] span{background:var(--field)}
+:root[data-theme=dark] .week button[aria-pressed=true] span{background:var(--g)}
+.goal{font-size:13px;color:var(--mute);margin:8px 0 0}
+.meals{display:grid;gap:14px}
+.meal{border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.mh{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 16px;background:var(--card)}
+.mh .t{font:800 18px Fraunces,serif;color:var(--mute);white-space:nowrap}
+.mh h3{margin:0;font-size:20px}
+.mh p{margin:2px 0 0;font-size:14px;color:var(--mute)}
+.mh .k{text-align:right;white-space:nowrap}
+.mh .k b{font:800 24px Fraunces,serif;display:block}
+.mh .k small{font-size:13px;color:var(--mute)}
+.thin{display:flex;height:6px}
+.thin i{display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:8px 10px;border-top:1px solid var(--line);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+th{font-weight:600;color:var(--mute);font-size:13px;border-top:0}
+td:first-child,th:first-child{text-align:left;white-space:normal;padding-left:16px}
+td:last-child,th:last-child{padding-right:16px}
+.scroll{overflow-x:auto}
+@media(max-width:600px){td,th{padding:7px 5px}td:first-child,th:first-child{padding-left:12px}}
+.panel{display:none}.panel.on{display:block}
+.cards{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.card h3{margin:0 0 4px;font-size:22px}
+.card .when{font-size:14px;color:var(--mute);margin:0 0 10px}
+.card ul{margin:8px 0 0;padding-left:18px}
+.pill{display:inline-block;font-size:13px;font-weight:600;border-radius:99px;padding:2px 10px;margin:2px 4px 2px 0;background:var(--bg);border:1px solid var(--line)}
+h2{font-size:clamp(26px,5vw,34px);margin:8px 0 14px}
+.shop{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+.shop label{display:flex;gap:10px;align-items:center;min-height:40px;border-top:1px solid var(--line);cursor:pointer}
+.shop input{width:20px;height:20px;accent-color:var(--field);flex:none}
+.shop input:checked+span{text-decoration:line-through;color:var(--mute)}
+.shop span b{font-weight:600}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;min-height:44px;padding:0 16px;font:600 15px Inter,sans-serif;cursor:pointer}
+.rules{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+.rule{border-left:0;background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--line)}
+.rule b{display:block;font:800 30px Fraunces,serif}
+.note{font-size:13px;color:var(--mute);margin-top:22px}
+@media(prefers-reduced-motion:no-preference){.band i,.week span{transition:width .4s,height .4s}}
+.mchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.mchips button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;min-height:44px;padding:0 16px;font:600 15px Inter,sans-serif;cursor:pointer}
+.mchips button[aria-pressed=true]{background:var(--field);color:var(--onf);border-color:var(--field)}
+.mchips button:focus-visible,.mx button:focus-visible{outline:3px solid var(--h);outline-offset:2px}
+.mx{margin-bottom:18px;font-size:13px}
+.mx th,.mx td{text-align:center;padding:6px 4px}
+.mx td:first-child,.mx th:first-child{text-align:left}
+.mx button{border:0;background:none;color:inherit;font:600 14px Inter,sans-serif;cursor:pointer;padding:4px 6px;border-radius:8px;width:100%}
+.mx tr.sel td{background:color-mix(in srgb,var(--g) 18%,transparent)}
+.mx tfoot td{font-weight:700}
+.mgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr))}
+.dcard{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.dcard header{padding:12px 14px 8px}
+.dcard header b{font:800 20px Fraunces,serif}
+.dcard header span{float:right;font:800 20px Fraunces,serif}
+.dcard header p{margin:2px 0 0;font-size:13px;color:var(--mute)}
+.dcard ul{list-style:none;margin:0;padding:6px 14px 10px;font-size:14px}
+.dcard li{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding:5px 0}
+.dcard li em{font-style:normal;color:var(--mute);white-space:nowrap}
+.dcard .m3{display:flex;gap:10px;padding:0 14px 12px;font-size:13px;color:var(--mute)}
+.empty{color:var(--mute)}
+</style></head><body>
+<header class="top">
+<h1>Mi plan semanal</h1>
+<p>Toca un día para ver qué comer y cuánto pesa cada cosa.</p>
+<div class="days" id="days" role="group" aria-label="Día"></div>
+<nav class="tabs" role="tablist">
+<button role="tab" aria-selected="true" data-p="dia" id="t-dia">Día</button>
+<button role="tab" aria-selected="false" data-p="comida" id="t-comida">Por comida</button>
+<button role="tab" aria-selected="false" data-p="tupper" id="t-tupper">Tuppers</button>
+<button role="tab" aria-selected="false" data-p="compra" id="t-compra">Compra</button>
+<button role="tab" aria-selected="false" data-p="reglas" id="t-reglas">Objetivos</button>
+</nav>
+</header>
+<main>
+<section class="panel on" id="dia">
+<div class="grid">
+<aside class="sum" id="sum"></aside>
+<div class="meals" id="meals"></div>
+</div>
+</section>
+
+<section class="panel" id="comida">
+<h2>Una comida, los 7 días</h2>
+<div class="mchips" id="mchips" role="group" aria-label="Comida"></div>
+<div class="scroll"><table class="mx" id="mx"></table></div>
+<div class="mgrid" id="mgrid"></div>
+</section>
+
+<section class="panel" id="tupper">
+<h2>Cocinas 2 veces y comes 6 días</h2>
+<div class="cards">
+<div class="card"><h3>Lote A · Arroz con pollo</h3><p class="when">Domingo, 30 min → comidas de martes y miércoles (2 tuppers)</p>
+<span class="pill">50 g arroz integral</span><span class="pill">130 g pollo</span><span class="pill">80 g pimiento</span><span class="pill">50 g cebolla</span><span class="pill">80 g tomate</span><span class="pill">10 g aceite</span>
+<p><b>Por tupper:</b> 466 kcal · 36 g prot · 50 g HC · 14 g grasa</p>
+<ul><li>Sofríe la cebolla y el pimiento.</li><li>Añade el pollo en dados con pimentón y comino, y después el tomate.</li><li>Mézclalo con el arroz y repártelo en 2 tuppers.</li></ul></div>
+<div class="card"><h3>Lote B · Pasta de lentejas con ternera</h3><p class="when">Jueves noche, 25 min → comidas de viernes y sábado (2 tuppers)</p>
+<span class="pill">60 g pasta de lentejas (en crudo)</span><span class="pill">100 g ternera magra</span><span class="pill">60 g zanahoria</span><span class="pill">50 g cebolla</span><span class="pill">60 g tomate</span><span class="pill">10 g aceite</span>
+<p><b>Por tupper:</b> 467 kcal · 37 g prot · 43 g HC · 16 g grasa</p>
+<ul><li>Cuece 120 g de pasta de lentejas (para 2 tuppers) 8–10 min y escúrrela.</li><li>Rehoga la cebolla y la zanahoria con la ternera picada o en dados, y añade el tomate triturado.</li><li>Mézclalo con la pasta y repártelo en 2 tuppers.</li></ul></div>
+</div>
+<h2 style="margin-top:28px">Sin cocinar: tupper Mercadona</h2>
+<p style="margin-top:-6px;color:var(--mute)">Proteína + verdura + hidrato + 10 g de aceite. Los nombres pueden variar un poco según la tienda.</p>
+<div class="cards">
+<div class="card"><h3>Pollo + wok + arroz</h3><span class="pill">130 g pollo asado en taquitos</span><span class="pill">200 g salteado de verduras congelado</span><span class="pill">1 vasito de arroz integral (125 g)</span><p>≈ 510 kcal · 38 g prot</p></div>
+<div class="card"><h3>Garbanzos + atún</h3><span class="pill">150 g garbanzos de bote</span><span class="pill">2 latas de atún (110 g)</span><span class="pill">tomate, cebolla y lechuga</span><p>≈ 425 kcal · 39 g prot</p></div>
+<div class="card"><h3>Gambas + wok + quinoa</h3><span class="pill">150 g gambas peladas</span><span class="pill">200 g verduras para wok</span><span class="pill">1 vasito de quinoa (125 g)</span><p>≈ 480 kcal · 33 g prot</p></div>
+</div>
+</section>
+
+<section class="panel" id="compra">
+<h2>Lista de la compra semanal</h2>
+<p style="margin-top:-6px;color:var(--mute)">Cenas para 4 (2 adultos y 2 niños). Desayunos, almuerzos, tuppers y meriendas, solo para ti.</p>
+<div class="shop" id="shop"></div>
+<p><button class="btn" id="reset">Desmarcar todo</button></p>
+</section>
+
+<section class="panel" id="reglas">
+<h2>Tus números</h2>
+<div class="rules">
+<div class="rule"><b>1.650–1.750</b>kcal los días de entreno (media semanal ≈ 1.530)</div>
+<div class="rule"><b>≈ 1.200–1.350</b>kcal lunes y jueves: días proteicos, 135–145 g de proteína. Solo el plátano de antes de entrenar aporta hidratos</div>
+<div class="rule"><b>100–125 g</b>Proteína al día, repartida en todas las comidas</div>
+<div class="rule"><b>−0,5 kg</b>Ritmo semanal ideal. Pésate los lunes en ayunas</div>
+</div>
+<h2 style="margin-top:28px">Cómo se cuentan las calorías</h2>
+<div class="rules">
+<div class="rule"><span class="dot" style="background:var(--p)"></span><b>4 kcal</b>por gramo de proteína · objetivo: 25–30 %</div>
+<div class="rule"><span class="dot" style="background:var(--h)"></span><b>4 kcal</b>por gramo de hidratos · objetivo: 45–50 %</div>
+<div class="rule"><span class="dot" style="background:var(--g)"></span><b>9 kcal</b>por gramo de grasa · objetivo: 20–30 %</div>
+</div>
+<ul style="margin-top:20px">
+<li>Pesa el aceite con cuchara (1 cucharada sopera = 10 g = 90 kcal). Es el error más común.</li><li>Patata: 100–150 g pesada en crudo, pelada y en dados, cocida al microondas 6–8 min en un bol tapado o asada en la bandeja con el pescado. Nunca frita.</li><li>Si en 2 semanas no bajas, quita la fruta de la comida de lunes a miércoles antes de tocar la proteína.</li>
+<li>Los días de entreno largo, toma un plátano extra antes de salir.</li>
+<li>Bebe de 1,5 a 2 L de agua al día, y más los días de natación y carrera.</li>
+</ul>
+</section>
+<p class="note">Valores aproximados de tablas de composición (en crudo). Compáralos con la etiqueta de lo que compres. Es un plan orientativo y no sustituye a una dietista-nutricionista.</p>
+</main>
+<script>
+{
+const D=[{"d":"Lunes","ent":"Natación · día proteico","rows":[["Desayuno","Leche semidesnatada",200,92,6.4,9.6,3.2],["Desayuno","Huevo",55,79,6.9,0.4,5.2],["Desayuno","Claras de huevo",70,36,7.7,0.5,0.1],["Desayuno","Jamón serrano",30,72,9.0,0.0,3.9],["Desayuno","Tomate",50,9,0.5,1.9,0.1],["Desayuno","Aceite de oliva",3,27,0.0,0.0,3.0],["Almuerzo","Leche semidesnatada",300,138,9.6,14.4,4.8],["Almuerzo","Pavo en lonchas",60,63,11.4,1.2,1.5],["Comida","Pollo asado en taquitos",150,210,36.0,1.5,6.8],["Comida","Salteado de verduras",250,100,4.5,15.0,1.2],["Comida","Aceite de oliva",5,44,0.0,0.0,5.0],["Merienda","Plátano",120,107,1.3,25.2,0.4],["Merienda","Pavo en lonchas",60,63,11.4,1.2,1.5],["Cena","Pechuga de pollo",150,165,34.5,0.0,2.2],["Cena","Pimiento",120,31,1.2,6.0,0.4],["Cena","Cebolla",80,32,0.9,7.2,0.1],["Cena","Tomate",80,14,0.7,3.1,0.2],["Cena","Lechuga",60,9,0.8,1.7,0.1],["Cena","Aceite de oliva",5,44,0.0,0.0,5.0]]},{"d":"Martes","ent":"Híbrido","rows":[["Desayuno","Leche semidesnatada",200,92,6.4,9.6,3.2],["Desayuno","Pan integral (bocadillo)",60,148,6.0,24.6,2.0],["Desayuno","Aceite de oliva",4,35,0.0,0.0,4.0],["Desayuno","Tomate",30,5,0.3,1.2,0.1],["Desayuno","Jamón serrano",30,72,9.0,0.0,3.9],["Desayuno","Queso de cabra (rulo)",15,44,2.9,0.1,3.5],["Almuerzo","Leche semidesnatada",300,138,9.6,14.4,4.8],["Almuerzo","Manzana",150,78,0.5,18.0,0.3],["Merienda","Plátano",120,107,1.3,25.2,0.4],["Merienda","Pavo en lonchas",60,63,11.4,1.2,1.5],["Comida","Arroz integral (crudo)",50,180,3.8,38.0,1.4],["Comida","Pechuga de pollo",130,143,29.9,0.0,1.9],["Comida","Pimiento",80,21,0.8,4.0,0.2],["Comida","Cebolla",50,20,0.6,4.5,0.1],["Comida","Tomate",80,14,0.7,3.1,0.2],["Comida","Aceite de oliva",10,88,0.0,0.0,10.0],["Comida","Mandarina",150,80,1.2,18.0,0.5],["Cena","Huevo",110,157,13.9,0.8,10.4],["Cena","Aceite de oliva",5,44,0.0,0.0,5.0],["Cena","Pimiento",100,26,1.0,5.0,0.3],["Cena","Cebolla",80,32,0.9,7.2,0.1],["Cena","Atún al natural (escurrido)",55,58,13.2,0.0,0.6],["Cena","Pan integral",30,74,3.0,12.3,1.0],["Cena","Tomate",50,9,0.5,1.9,0.1]]},{"d":"Miércoles","ent":"Natación","rows":[["Desayuno","Leche semidesnatada",200,92,6.4,9.6,3.2],["Desayuno","Pan integral (bocadillo)",60,148,6.0,24.6,2.0],["Desayuno","Aceite de oliva",4,35,0.0,0.0,4.0],["Desayuno","Tomate",30,5,0.3,1.2,0.1],["Desayuno","Jamón serrano",30,72,9.0,0.0,3.9],["Desayuno","Queso de cabra (rulo)",15,44,2.9,0.1,3.5],["Almuerzo","Leche semidesnatada",300,138,9.6,14.4,4.8],["Almuerzo","Kiwi",100,61,1.1,13.0,0.5],["Merienda","Plátano",120,107,1.3,25.2,0.4],["Merienda","Pavo en lonchas",60,63,11.4,1.2,1.5],["Comida","Arroz integral (crudo)",50,180,3.8,38.0,1.4],["Comida","Pechuga de pollo",130,143,29.9,0.0,1.9],["Comida","Pimiento",80,21,0.8,4.0,0.2],["Comida","Cebolla",50,20,0.6,4.5,0.1],["Comida","Tomate",80,14,0.7,3.1,0.2],["Comida","Aceite de oliva",10,88,0.0,0.0,10.0],["Comida","Mandarina",150,80,1.2,18.0,0.5],["Cena","Hamburguesa de pollo",130,182,22.1,3.9,9.1],["Cena","Patata",150,116,3.0,25.5,0.1],["Cena","Lechuga",80,12,1.1,2.3,0.2],["Cena","Tomate",100,18,0.9,3.9,0.2],["Cena","Aceite de oliva",5,44,0.0,0.0,5.0]]},{"d":"Jueves","ent":"Híbrido · día proteico","rows":[["Desayuno","Leche semidesnatada",200,92,6.4,9.6,3.2],["Desayuno","Huevo",55,79,6.9,0.4,5.2],["Desayuno","Claras de huevo",70,36,7.7,0.5,0.1],["Desayuno","Jamón serrano",30,72,9.0,0.0,3.9],["Desayuno","Tomate",50,9,0.5,1.9,0.1],["Desayuno","Aceite de oliva",3,27,0.0,0.0,3.0],["Almuerzo","Leche semidesnatada",300,138,9.6,14.4,4.8],["Almuerzo","Pavo en lonchas",60,63,11.4,1.2,1.5],["Comida","Atún al natural (escurrido)",110,116,26.4,0.0,1.1],["Comida","Huevo",55,79,6.9,0.4,5.2],["Comida","Tomate",150,27,1.4,5.8,0.3],["Comida","Lechuga",80,12,1.1,2.3,0.2],["Comida","Cebolla",30,12,0.3,2.7,0.0],["Comida","Aceite de oliva",5,44,0.0,0.0,5.0],["Merienda","Plátano",120,107,1.3,25.2,0.4],["Merienda","Pavo en lonchas",60,63,11.4,1.2,1.5],["Cena","Merluza",200,142,32.0,0.0,1.6],["Cena","Calabacín",250,42,3.0,7.8,0.8],["Cena","Aceite de oliva",5,44,0.0,0.0,5.0]]},{"d":"Viernes","ent":"Suave","rows":[["Desayuno","Leche semidesnatada",200,92,6.4,9.6,3.2],["Desayuno","Pan integral (bocadillo)",60,148,6.0,24.6,2.0],["Desayuno","Aceite de oliva",4,35,0.0,0.0,4.0],["Desayuno","Tomate",30,5,0.3,1.2,0.1],["Desayuno","Jamón serrano",30,72,9.0,0.0,3.9],["Desayuno","Queso de cabra (rulo)",15,44,2.9,0.1,3.5],["Almuerzo","Leche semidesnatada",300,138,9.6,14.4,4.8],["Almuerzo","Kiwi",100,61,1.1,13.0,0.5],["Comida","Pasta de lentejas (cruda)",60,204,14.4,30.0,1.2],["Comida","Ternera magra",100,120,21.0,0.0,4.0],["Comida","Zanahoria",60,25,0.5,6.0,0.1],["Comida","Cebolla",50,20,0.6,4.5,0.1],["Comida","Tomate",60,11,0.5,2.3,0.1],["Comida","Aceite de oliva",10,88,0.0,0.0,10.0],["Comida","Mandarina",150,80,1.2,18.0,0.5],["Cena","Hamburguesa de vacuno",110,220,19.8,1.6,14.8],["Cena","Pan de hamburguesa integral",60,156,5.4,27.0,2.7],["Cena","Lechuga",30,4,0.4,0.9,0.1],["Cena","Tomate",50,9,0.5,1.9,0.1],["Cena","Cebolla",20,8,0.2,1.8,0.0]]},{"d":"Sábado","ent":"Híbrido + carrera","rows":[["Desayuno","Leche semidesnatada",200,92,6.4,9.6,3.2],["Desayuno","Pan integral (bocadillo)",60,148,6.0,24.6,2.0],["Desayuno","Aceite de oliva",4,35,0.0,0.0,4.0],["Desayuno","Tomate",30,5,0.3,1.2,0.1],["Desayuno","Jamón serrano",30,72,9.0,0.0,3.9],["Desayuno","Queso de cabra (rulo)",15,44,2.9,0.1,3.5],["Almuerzo","Leche semidesnatada",300,138,9.6,14.4,4.8],["Almuerzo","Manzana",150,78,0.5,18.0,0.3],["Merienda","Plátano",120,107,1.3,25.2,0.4],["Merienda","Pavo en lonchas",60,63,11.4,1.2,1.5],["Comida","Pasta de lentejas (cruda)",60,204,14.4,30.0,1.2],["Comida","Ternera magra",100,120,21.0,0.0,4.0],["Comida","Zanahoria",60,25,0.5,6.0,0.1],["Comida","Cebolla",50,20,0.6,4.5,0.1],["Comida","Tomate",60,11,0.5,2.3,0.1],["Comida","Aceite de oliva",10,88,0.0,0.0,10.0],["Comida","Mandarina",150,80,1.2,18.0,0.5],["Cena","Huevo",110,157,13.9,0.8,10.4],["Cena","Salmón ahumado",60,70,10.8,0.0,2.6],["Cena","Pan integral",30,74,3.0,12.3,1.0],["Cena","Tomate",60,11,0.5,2.3,0.1],["Cena","Aceite de oliva",5,44,0.0,0.0,5.0]]},{"d":"Domingo","ent":"Descanso","rows":[["Desayuno","Leche semidesnatada",200,92,6.4,9.6,3.2],["Desayuno","Pan integral (bocadillo)",60,148,6.0,24.6,2.0],["Desayuno","Aceite de oliva",4,35,0.0,0.0,4.0],["Desayuno","Tomate",30,5,0.3,1.2,0.1],["Desayuno","Jamón serrano",30,72,9.0,0.0,3.9],["Desayuno","Queso de cabra (rulo)",15,44,2.9,0.1,3.5],["Almuerzo","Leche semidesnatada",300,138,9.6,14.4,4.8],["Almuerzo","Kiwi",100,61,1.1,13.0,0.5],["Comida","Garbanzos cocidos (bote)",150,180,10.5,24.0,3.9],["Comida","Atún al natural (escurrido)",110,116,26.4,0.0,1.1],["Comida","Tomate",100,18,0.9,3.9,0.2],["Comida","Cebolla",30,12,0.3,2.7,0.0],["Comida","Lechuga",80,12,1.1,2.3,0.2],["Comida","Aceite de oliva",10,88,0.0,0.0,10.0],["Comida","Mandarina",150,80,1.2,18.0,0.5],["Cena","Crema de verduras",300,120,3.0,15.0,5.4],["Cena","Pechuga de pollo",130,143,29.9,0.0,1.9],["Cena","Aceite de oliva",5,44,0.0,0.0,5.0],["Cena","Pan integral",30,74,3.0,12.3,1.0],["Cena","Mandarina",150,80,1.2,18.0,0.5]]}];
+const META={
+Desayuno:{t:'8:00',n:'Café con leche y bocadillo integral'},
+Almuerzo:{t:'11:00',n:''},
+Comida:{t:'14:00',n:''},
+Merienda:{t:'17:30',n:'Antes de entrenar'},
+Cena:{t:'21:00',n:''}};
+const COM={'Lunes':'Pollo asado con salteado de verduras (sin arroz)','Martes':'Lote A · arroz con pollo','Miércoles':'Lote A · arroz con pollo','Jueves':'Ensalada de atún, huevo y tomate','Viernes':'Lote B · pasta de lentejas con ternera','Sábado':'Lote B · pasta de lentejas con ternera','Domingo':'Ensalada de garbanzos y atún'};
+const CEN={'Lunes':'Fajitas sin tortilla: pollo con pimiento y cebolla','Martes':'Tortilla francesa con salteado de pimiento y cebolla','Miércoles':'Hamburguesa de pollo','Jueves':'Merluza con calabacín (sin patata)','Viernes':'Hamburguesa de ternera','Sábado':'Revuelto con salmón','Domingo':'Crema de verduras y pollo'};
+const ORDER=['Desayuno','Almuerzo','Comida','Merienda','Cena'];
+const f1=x=>x.toFixed(1).replace('.',','),fk=x=>Math.round(x).toLocaleString('es-ES');
+const sumRows=r=>r.reduce((a,x)=>[a[0]+x[3],a[1]+x[4],a[2]+x[5],a[3]+x[6]],[0,0,0,0]);
+const pct=t=>{const k=t[1]*4+t[2]*4+t[3]*9;return [t[1]*4/k*100,t[2]*4/k*100,t[3]*9/k*100]};
+const bar=(t,cls)=>{const p=pct(t);return `<div class="${cls}"><i style="width:${p[0]}%;background:var(--p)"></i><i style="width:${p[1]}%;background:var(--h)"></i><i style="width:${p[2]}%;background:var(--g)"></i></div>`};
+const short=['L','M','X','J','V','S','D'];
+const days=document.getElementById('days'),sum=document.getElementById('sum'),meals=document.getElementById('meals');
+let cur=(new Date().getDay()+6)%7;
+try{const s=localStorage.getItem('plan-dia');if(s!==null)cur=+s}catch(e){}
+const PRO={'Lunes':1,'Jueves':1};
+function name(m,d,rows){if(PRO[d.d]&&m==='Desayuno')return 'Café con leche y revuelto con jamón';if(PRO[d.d]&&m==='Almuerzo')return 'Café con leche grande y pavo';if(m==='Comida')return COM[d.d];if(m==='Cena')return CEN[d.d];if(m==='Almuerzo')return rows.some(r=>r[1]==='Manzana')?'Café con leche grande y manzana':'Café con leche grande y kiwi';return META[m].n}
+function render(){
+ const d=D[cur],T=sumRows(d.rows),P=pct(T);
+ days.innerHTML=D.map((x,i)=>`<button aria-pressed="${i===cur}" data-i="${i}">${x.d.slice(0,3)}<small>${fk(sumRows(x.rows)[0])}</small></button>`).join('');
+ const max=Math.max(...D.map(x=>sumRows(x.rows)[0]));
+ sum.innerHTML=`<span class="tag">${d.ent}</span>
+ <div class="big num">${fk(T[0])}<span>kcal</span></div>
+ ${bar(T,'band')}
+ <div class="mac">
+ <div><small><span class="dot" style="background:var(--p)"></span>Proteína</small><b>${Math.round(T[1])} g</b><small>${Math.round(P[0])} %</small></div>
+ <div><small><span class="dot" style="background:var(--h)"></span>Hidratos</small><b>${Math.round(T[2])} g</b><small>${Math.round(P[1])} %</small></div>
+ <div><small><span class="dot" style="background:var(--g)"></span>Grasa</small><b>${Math.round(T[3])} g</b><small>${Math.round(P[2])} %</small></div>
+ </div>
+ <p class="goal">Objetivo: proteína 25–30 % · hidratos 45–50 % · grasa 20–30 %</p>
+ <div class="week">${D.map((x,i)=>{const k=sumRows(x.rows)[0];return `<button aria-pressed="${i===cur}" data-i="${i}" aria-label="${x.d}, ${fk(k)} kcal"><span style="height:${k/max*80}px"></span>${short[i]}</button>`}).join('')}</div>`;
+ meals.innerHTML=ORDER.map(m=>{const r=d.rows.filter(x=>x[0]===m);if(!r.length)return '';const t=sumRows(r);
+  return `<article class="meal"><div class="mh"><span class="t">${META[m].t}</span><div><h3>${m}</h3><p>${name(m,d,r)}</p></div><div class="k"><b>${fk(t[0])}</b><small>kcal · ${Math.round(t[1])} g prot</small></div></div>${bar(t,'thin')}
+  <div class="scroll"><table><thead><tr><th>Alimento</th><th>g</th><th>kcal</th><th>Prot</th><th>HC</th><th>Grasa</th></tr></thead><tbody>
+  ${r.map(x=>`<tr><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]}</td><td>${f1(x[4])}</td><td>${f1(x[5])}</td><td>${f1(x[6])}</td></tr>`).join('')}
+  </tbody></table></div></article>`}).join('');
+}
+function pick(e){const b=e.target.closest('button[data-i]');if(!b)return;cur=+b.dataset.i;try{localStorage.setItem('plan-dia',cur)}catch(_){}render()}
+days.addEventListener('click',pick);sum.addEventListener('click',pick);
+render();
+{
+const mchips=document.getElementById('mchips'),mx=document.getElementById('mx'),mgrid=document.getElementById('mgrid');
+let cm='Desayuno';
+function rm(){
+ mchips.innerHTML=ORDER.map(m=>`<button aria-pressed="${m===cm}" data-m="${m}">${m}</button>`).join('');
+ const cell=(d,m)=>sumRows(d.rows.filter(x=>x[0]===m));
+ mx.innerHTML=`<thead><tr><th>kcal</th>${D.map(d=>`<th>${d.d.slice(0,3)}</th>`).join('')}</tr></thead><tbody>${ORDER.map(m=>`<tr class="${m===cm?'sel':''}"><td><button data-m="${m}">${m}</button></td>${D.map(d=>{const k=cell(d,m)[0];return `<td>${k?fk(k):'—'}</td>`}).join('')}</tr>`).join('')}</tbody><tfoot><tr><td>Total</td>${D.map(d=>`<td>${fk(sumRows(d.rows)[0])}</td>`).join('')}</tr></tfoot>`;
+ mgrid.innerHTML=D.map(d=>{const r=d.rows.filter(x=>x[0]===cm);if(!r.length)return `<article class="dcard"><header><b>${d.d}</b><p class="empty">Sin ${cm.toLowerCase()} (día de descanso)</p></header></article>`;const t=sumRows(r);
+  return `<article class="dcard"><header><span>${fk(t[0])}</span><b>${d.d}</b><p>${name(cm,d,r)||META[cm].n}</p></header>${bar(t,'thin')}<ul>${r.map(x=>`<li><span>${x[1]}</span><em>${x[2]} g · ${x[3]} kcal</em></li>`).join('')}</ul><div class="m3"><span><span class="dot" style="background:var(--p)"></span>${f1(t[1])} g</span><span><span class="dot" style="background:var(--h)"></span>${f1(t[2])} g</span><span><span class="dot" style="background:var(--g)"></span>${f1(t[3])} g</span></div></article>`}).join('');
+}
+function pm(e){const b=e.target.closest('button[data-m]');if(!b)return;cm=b.dataset.m;rm()}
+mchips.addEventListener('click',pm);mx.addEventListener('click',pm);
+rm();
+}
+const tabs=[...document.querySelectorAll('.tabs button')];
+tabs.forEach(b=>b.addEventListener('click',()=>{tabs.forEach(x=>x.setAttribute('aria-selected',x===b));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id===b.dataset.p));days.style.display=b.dataset.p==='dia'?'':'none'}));
+const SHOP={'Carne y pescado':['<b>1,3 kg</b> pechuga de pollo (390 g tuppers + 900 g cenas)','<b>4–5</b> hamburguesas de pollo','<b>4–5</b> hamburguesas de vacuno','<b>700 g</b> merluza o pescado blanco','<b>200 g</b> ternera magra picada o en dados (tuppers)','<b>150 g</b> pollo asado en taquitos (lunes)','<b>2 sobres</b> salmón ahumado','<b>2 paquetes</b> pavo en lonchas (360 g, meriendas)','<b>250 g</b> jamón serrano en lonchas (desayunos)','<b>8 latas</b> atún al natural'],
+'Huevos y lácteos':['<b>18</b> huevos','<b>1 brick</b> claras de huevo','<b>3,5 L</b> leche semidesnatada (500 ml al día)','<b>1 rulo</b> queso de cabra (105 g)'],
+'Pan, cereales y legumbres':['<b>5</b> panecillos o bocadillos integrales (60 g, desayunos)','<b>1 paquete</b> pan integral (cenas)','<b>2 paquetes</b> tortillas de trigo integrales (8 uds)','<b>1 paquete</b> pan de hamburguesa integral','<b>200 g</b> arroz integral','<b>1 paquete de 250 g</b> pasta de lentejas','<b>1 bote</b> garbanzos cocidos'],
+'Verdura':['<b>5</b> pimientos','<b>5</b> cebollas','<b>1,5 kg</b> tomates (unos 12)','<b>3</b> zanahorias','<b>4</b> calabacines','<b>2 bolsas</b> salteado de pimiento y cebolla congelado','<b>1 bolsa</b> salteado de verduras congelado (lunes)','<b>3</b> lechugas o ensaladas de bolsa','<b>2 bricks</b> crema de verduras (1 L)','<b>1 kg</b> patatas'],
+'Fruta':['<b>5</b> plátanos','<b>11</b> mandarinas','<b>4</b> kiwis','<b>3</b> manzanas'],
+'Despensa':['Aceite de oliva virgen extra','Pimentón, comino y orégano','Café']};
+const shop=document.getElementById('shop');let ck={};try{ck=JSON.parse(localStorage.getItem('plan-compra2')||'{}')}catch(e){}
+shop.innerHTML=Object.entries(SHOP).map(([g,l],gi)=>`<div class="card"><h3>${g}</h3>${l.map((x,i)=>{const id='s'+gi+'_'+i;return `<label for="${id}"><input type="checkbox" id="${id}" ${ck[id]?'checked':''}><span>${x}</span></label>`}).join('')}</div>`).join('');
+shop.addEventListener('change',e=>{ck[e.target.id]=e.target.checked;try{localStorage.setItem('plan-compra2',JSON.stringify(ck))}catch(_){}});
+document.getElementById('reset').addEventListener('click',()=>{ck={};shop.querySelectorAll('input').forEach(i=>i.checked=false);try{localStorage.removeItem('plan-compra2')}catch(_){}});
+}
+</script></body></html>
